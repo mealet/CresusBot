@@ -5,7 +5,6 @@ from disnake import ButtonStyle
 from disnake import TextInputStyle
 import datetime
 import os
-from websocket_local import keep_alive
 
 intents = disnake.Intents.all()
 command_sync_flags = commands.CommandSyncFlags.none()
@@ -180,5 +179,4 @@ async def reg(inter):
       "Комманда создана для канала <#1059752620127965285>", ephemeral=True)
 
 
-keep_alive()
-bot.run(os.getenv("token"))
+bot.run("MTA2MTY3MzQ1NjY5OTE4MzIyNw.G43uc2.-V2tlAhBhvaLcW_4C1YmGbb2IHDnbRG1nH167A")
