@@ -4,8 +4,10 @@ from disnake.ui import Button
 from disnake import ButtonStyle
 from disnake import TextInputStyle
 import datetime
+import threading
 import os
 
+now = datetime.datetime.now()
 intents = disnake.Intents.all()
 command_sync_flags = commands.CommandSyncFlags.none()
 command_sync_flags.sync_commands = True
@@ -15,8 +17,8 @@ bot = commands.Bot(command_prefix="!",
                    command_sync_flags=command_sync_flags)
 global start_time
 start_time = datetime.datetime.now()
-
-
+global logs_file
+logs_ = open(f"logs/{now.day}-{now.month}-{now.year} {now.minute}-{now.hour}.log", mode="a")
 @bot.event
 async def on_ready():
   print("[SYSTEM][ON_READY]: Бот запущен")
@@ -107,6 +109,7 @@ class KitModal(disnake.ui.Modal):
                         description=f"Заявку отправил: {inter.author.mention}")
 
     print(f"[CALLBACK][KIT_PROJECT] Полученые данные: {inter.text_values}")
+    logs_.write(f"[CALLBACK][KIT_PROJECT] Полученые данные: {inter.text_values}")
     emb.add_field(name="Имя",
                   value=inter.text_values["kit_project_name"],
                   inline=False)
@@ -123,7 +126,7 @@ class KitModal(disnake.ui.Modal):
     await inter.response.send_message(
       f"{inter.author.mention} | Заявка отправлена. Ожидайте првоерки, вам напишут в личные сообщения.\n`Комманда регистрации /reg`"
     )
-    await channel.send(embed=emb)
+    await channel.send("<@&981616189182717973>", embed=emb)
 
 
 class LogModal(disnake.ui.Modal):
@@ -144,15 +147,18 @@ class LogModal(disnake.ui.Modal):
                      custom_id="archive")
 
   async def callback(self, inter: disnake.ModalInteraction):
+    print(f"[CALLBACK][ARCHIVE] Получены данные: ({inter.author.name}#{inter.author.tag})=({inter.text_values['a_log']})")
+    logs_.write(f"[CALLBACK][ARCHIVE] Получены данные: ({inter.author.name}#{inter.author.tag})=({inter.text_values['a_log']})")
     emb = disnake.Embed(title="Запись в архив",
                         description=f"Автор: {inter.author.mention}",
                         timestamp=datetime.datetime.now(),
                         color=disnake.Colour.green())
 
-    emb.add_field(name="Сфера действий", value=inter.text_values["a_log"])
+    emb.add_field(name="Сфера действий", value=inter.text_values["a_sphere"], inline=False)
+    emb.add_field(name="Лог действий", value=inter.text_values["a_log"], inline=False)
 
     await inter.response.send_message(embed=emb)
-    await inter.response.send_message("Запись успешно создана", ephemeral=True)
+    await inter.response.send("Запись успешно создана", ephemeral=True)
 
 
 @bot.slash_command(name="archive", description="Запись лог действий в архив")
@@ -179,4 +185,14 @@ async def reg(inter):
       "Комманда создана для канала <#1059752620127965285>", ephemeral=True)
 
 
-bot.run("MTA2MTY3MzQ1NjY5OTE4MzIyNw.G2OQDg.QEb-vYGfGfHsEIn2aF9Gp1RWMHkJvlV0wj76RQ")
+def console():
+    while True:
+        cmd = input("$> ")
+        if cmd.lower() == "exit":
+            logs_.close()
+            quit()
+
+if __name__ == "__main__":
+    t = threading.Thread(target=console)
+    t.start()
+    bot.run("MTA2MTY3MzQ1NjY5OTE4MzIyNw.G2OQDg.QEb-vYGfGfHsEIn2aF9Gp1RWMHkJvlV0wj76RQ")
