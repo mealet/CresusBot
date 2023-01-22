@@ -17,8 +17,8 @@ bot = commands.Bot(command_prefix="!",
                    command_sync_flags=command_sync_flags)
 global start_time
 start_time = datetime.datetime.now()
-global logs_file
-logs_ = open(f"logs/{now.day}-{now.month}-{now.year} {now.minute}-{now.hour}.log", mode="a")
+global logs_
+logs_ = open(f"logs/{now.day}-{now.month}-{now.year} {now.hour}-{now.minute}.log", mode="a")
 @bot.event
 async def on_ready():
   print("[SYSTEM][ON_READY]: Бот запущен")
@@ -28,6 +28,9 @@ async def on_ready():
 async def on_message(message):
   print(
     f"[DISCORD][MESSAGE][{message.channel.name}] {message.author.name}: {message.content}"
+  )
+  logs_.write(
+      f"[DISCORD][MESSAGE][{message.channel.name}] {message.author.name}: {message.content}"
   )
 
 
@@ -195,4 +198,4 @@ def console():
 if __name__ == "__main__":
     t = threading.Thread(target=console)
     t.start()
-    bot.run("MTA2MTY3MzQ1NjY5OTE4MzIyNw.G2OQDg.QEb-vYGfGfHsEIn2aF9Gp1RWMHkJvlV0wj76RQ")
+    bot.run("")
